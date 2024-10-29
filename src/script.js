@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { Sky } from "three/addons/objects/Sky.js";
 import { Timer } from "three/addons/misc/Timer.js";
 import GUI from "lil-gui";
 
@@ -21,12 +22,12 @@ Textures
 const textureLoader = new THREE.TextureLoader();
 
 // floorTextures
-const floorAlphaTexture = textureLoader.load("./floor/alpha.jpg");
+const floorAlphaTexture = textureLoader.load("./floor/alpha.webp");
 const floorColorTexture = textureLoader.load(
-  "./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_diff_1k.jpg"
+  "./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_diff_1k.webp"
 );
 const floorArmTexture = textureLoader.load(
-  "./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_arm_1k.jpg"
+  "./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_arm_1k.webp"
 );
 const floorNormalTexture = textureLoader.load(
   "./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_nor_gl_1k.jpg"
@@ -171,13 +172,13 @@ graveNormalTexture.wrapS = THREE.RepeatWrapping;
 
 // door
 
-const doorColorTexture = textureLoader.load("./door/color.jpg");
-const doorAlphaTexture = textureLoader.load("./door/alpha.jpg");
-const doorAmbientTexture = textureLoader.load("./door/ambientOcclusion.jpg");
-const doorHeightTexture = textureLoader.load("./door/height.jpg");
-const doorMetalnessTexture = textureLoader.load("./door/metalness.jpg");
-const doorNormalTexture = textureLoader.load("./door/normal.jpg");
-const doorRoughnessTexture = textureLoader.load("./door/roughness.jpg");
+const doorColorTexture = textureLoader.load("./door/color.webp");
+const doorAlphaTexture = textureLoader.load("./door/alpha.webp");
+const doorAmbientTexture = textureLoader.load("./door/ambientOcclusion.webp");
+const doorHeightTexture = textureLoader.load("./door/height.webp");
+const doorMetalnessTexture = textureLoader.load("./door/metalness.webp");
+const doorNormalTexture = textureLoader.load("./door/normal.webp");
+const doorRoughnessTexture = textureLoader.load("./door/roughness.webp");
 
 doorColorTexture.colorSpace = THREE.SRGBColorSpace;
 
@@ -399,6 +400,59 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// Cast and receive shadow
+
+directionalLight.castShadow = true;
+ghost1.castShadow = true;
+ghost2.castShadow = true;
+ghost3.castShadow = true;
+
+walls.castShadow = true;
+walls.receiveShadow = true;
+
+roof.castShadow = true;
+floor.receiveShadow = true;
+
+for (const grave of graves.children) {
+  grave.castShadow = true;
+  grave.receiveShadow = true;
+}
+
+directionalLight.shadow.mapSize.width = 256;
+directionalLight.shadow.mapSize.height = 256;
+directionalLight.shadow.camera.top = 8;
+directionalLight.shadow.camera.bottom = -8;
+directionalLight.shadow.camera.left = -8;
+directionalLight.shadow.camera.right = 8;
+directionalLight.shadow.camera.near = 1;
+directionalLight.shadow.camera.far = 20;
+
+ghost1.shadow.mapSize.width = 256;
+ghost1.shadow.mapSize.height = 256;
+ghost1.shadow.camera.far = 10;
+
+// Sky
+
+const sky = new Sky();
+sky.scale.setScalar(100);
+scene.add(sky);
+
+sky.material.uniforms["turbidity"].value = 10;
+sky.material.uniforms["rayleigh"].value = 3;
+sky.material.uniforms["mieCoefficient"].value = 0.1;
+sky.material.uniforms["mieDirectionalG"].value = 0.95;
+sky.material.uniforms["sunPosition"].value.set(0.3, -0.038, -0.95);
+
+// fog
+
+scene.fog = new THREE.FogExp2("#0c343f", 0.1);
+
+/*
+Shadows
+*/
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 /**
  * Animate
