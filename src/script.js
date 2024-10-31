@@ -723,6 +723,26 @@ wall2.position.x = -2;
 
 house.add(wall2);
 
+// air ballon1
+const ballon1 = new THREE.Mesh(
+  new THREE.SphereGeometry(1, 32, 32),
+  new THREE.MeshStandardMaterial({ color: "#000000" })
+);
+ballon1.scale.setScalar(0.15);
+ballon1.position.set(-2, 4, 0);
+
+scene.add(ballon1);
+
+// ballon2
+const ballon2 = new THREE.Mesh(
+  new THREE.SphereGeometry(1, 32, 32),
+  new THREE.MeshStandardMaterial({ color: "#000000" })
+);
+ballon2.scale.setScalar(0.15);
+ballon2.position.set(-2, 2, 0);
+
+scene.add(ballon2);
+
 // roof
 const roof = new THREE.Mesh(
   new THREE.ConeGeometry(3.5, 1.5, 4),
@@ -1013,6 +1033,16 @@ const tick = () => {
   // Timer
   timer.update();
   const elapsedTime = timer.getElapsed();
+
+  // ballon1
+  const ballonAngle = elapsedTime * 0.5;
+  ballon1.position.x = Math.cos(ballonAngle) * 5;
+  ballon1.position.z = Math.sin(ballonAngle) * 5;
+
+  // ballon2
+  ballon2.position.x = Math.sin(ballonAngle) * 7;
+  ballon2.position.z = Math.cos(ballonAngle) * 7;
+  ballon2.position.y = Math.sin(ballonAngle) * 2;
 
   // ghost
   const ghost1Angle = elapsedTime * 0.5;
